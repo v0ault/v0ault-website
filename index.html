@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V0AULT</title>
+  <meta name="description" content="V0AULT is a design archive dedicated for interdisciplinary pieces involving architecture and movement." />
+  <meta property="og:title" content="V0AULT" />
+  <meta property="og:description" content="V0AULT is a design archive dedicated for interdisciplinary pieces involving architecture and movement." />
+  
+  <!-- Modern Clean Architectural Typography -->
+  <link rel="preload" href="fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <link rel="stylesheet" href="styles.css?v=108" />
+</head>
+<body class="loading-state" data-light-mode="cursor">
+
+  <!-- Procedural Micro-Texture Canvas (Snow / Plaster Grain) -->
+  <canvas id="noise-canvas" class="noise-overlay" aria-hidden="true"></canvas>
+
+
+  <!-- SVG Filters for Inward Bevel & Dynamic Lighting -->
+  <svg class="svg-filters" width="0" height="0" aria-hidden="true">
+    <defs>
+      <!-- Inward Bevel / Deep Deboss Filter -->
+      <filter id="deboss-filter" x="-20%" y="-20%" width="140%" height="140%">
+        <!-- Top-Left Cast Shadow -->
+        <feOffset dx="2.5" dy="2.5" in="SourceAlpha" result="offsetShadow" />
+        <feGaussianBlur stdDeviation="2" in="offsetShadow" result="blurShadow" />
+        <feComposite operator="out" in="SourceGraphic" in2="blurShadow" result="cutShadow" />
+        <feFlood flood-color="rgba(30,28,34,0.38)" result="shadowTint" />
+        <feComposite operator="in" in="shadowTint" in2="cutShadow" result="shadowElement" />
+
+        <!-- Bottom-Right Highlight Rim -->
+        <feOffset dx="-2" dy="-2" in="SourceAlpha" result="offsetLight" />
+        <feGaussianBlur stdDeviation="1.5" in="offsetLight" result="blurLight" />
+        <feComposite operator="out" in="SourceGraphic" in2="blurLight" result="cutLight" />
+        <feFlood flood-color="rgba(255,255,255,0.95)" result="lightTint" />
+        <feComposite operator="in" in="lightTint" in2="cutLight" result="lightElement" />
+
+        <feMerge>
+          <feMergeNode in="shadowElement" />
+          <feMergeNode in="lightElement" />
+          <feMergeNode in="SourceGraphic" opacity="0.9" />
+        </feMerge>
+      </filter>
+
+      <!-- Inward Bevel Geometry Morphing Filter -->
+      <filter id="inward-bevel-morph" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feImage id="fe-morph-image" href="assets/inward-bevel-map.png" result="morphMap" preserveAspectRatio="none" />
+        <feDisplacementMap 
+          id="fe-displace"
+          in="SourceGraphic" 
+          in2="morphMap" 
+          scale="0" 
+          xChannelSelector="R" 
+          yChannelSelector="G" 
+          result="displaced" 
+        />
+        <feColorMatrix 
+          id="fe-shadow-deepen"
+          in="displaced" 
+          type="matrix" 
+          values="
+            1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            0 0 0 1 0" 
+          result="deepened" 
+        />
+        <feMerge>
+          <feMergeNode in="deepened" />
+        </feMerge>
+      </filter>
+
+      <!-- Wave 0 Vault Door Handle SVG Symbol Template -->
+      <g id="v0ault-handle-symbol">
+        <!-- Outer circular rim -->
+        <path d="M 32 18 C 16 26 8 44 10 66 C 12 88 28 104 52 104 C 74 104 90 90 92 72" 
+              fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        <!-- S-curve wave handle cutting diagonally through -->
+        <path d="M 32 98 C 42 92 52 80 54 62 C 56 44 64 26 80 22 C 90 20 100 26 100 36" 
+              fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        <!-- Pivot latch dot above top handle -->
+        <circle cx="86" cy="14" r="4.5" fill="currentColor"/>
+        <!-- Inner architectural fluting grooves -->
+        <path d="M 28 48 C 27 60 28 72 32 80" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M 38 42 C 38 54 40 66 43 74" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+      </g>
+    </defs>
+  </svg>
+
+  <!-- ========================================================================= -->
+  <!-- 1. ENTRANCE LANDING PAGE: Only the Logo Centered (1/3 screen) & Snow Text -->
+  <!-- ========================================================================= -->
+  <section id="landing-view" class="landing-view" aria-label="V0AULT Entrance Chamber">
+    <!-- Center Interaction Zone: Standalone Rotating Brand Logo (No Backdrop Geometry) -->
+    <div class="entrance-center-stage" id="entrance-trigger-zone" role="button" tabindex="0" aria-label="Enter V0AULT">
+      <!-- Logo Container: Exactly 1/3 of screen, standalone monogram rotating on its own -->
+      <div class="logo-monolith-frame" id="logo-monolith-frame">
+        <div class="logo-inner-plate" id="logo-inner-plate">
+          <img 
+            src="assets/brand-monogram-normal.png?v=30" 
+            alt="V0AULT Brand Logo" 
+            id="v0ault-monogram-normal"
+            class="v0ault-monogram-img monogram-normal"
+            draggable="false"
+          />
+          <img 
+            src="assets/brand-monogram-pressed.png?v=30" 
+            alt="V0AULT Brand Logo Pressed" 
+            id="v0ault-monogram-pressed"
+            class="v0ault-monogram-img monogram-pressed"
+            draggable="false"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Soft Circle Open Transition (Circular Iris Opening - expands only after rotation) -->
+  <div id="circle-open-iris" class="circle-open-iris" aria-hidden="true"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. NEXT LANDING PAGE: V0AULT Architectural & Movement Bio Page            -->
+  <!-- ========================================================================= -->
+  <main id="main-portfolio" class="main-portfolio bio-view is-hidden" aria-hidden="true">
+    
+    <!-- Top Minimalist Header (Image 3 Brandlogo on left, Image 2 headerlogo on right) -->
+    <header class="bio-header" id="bio-header">
+      <div class="bio-header-left">
+        <button id="bio-brand-logo-btn" class="bio-brand-btn" title="V0AULT Entrance / Re-seal Vault" aria-label="Return to Entrance">
+          <img src="assets/brand-logo-cropped.png?v=3" alt="V0AULT Brand Logo" class="bio-brand-img" />
+        </button>
+      </div>
+
+      <nav class="bio-header-right" aria-label="Bio Page Navigation">
+        <button id="bio-nav-arch-btn" class="bio-nav-item bio-nav-arch" title="Architecture">
+          <img src="assets/nav-architecture.png?v=3" alt="< ARCHITECTURE" class="bio-nav-img bio-nav-img-arch bio-nav-normal" />
+          <img src="assets/nav-architecture-pressed.png?v=3" alt="< ARCHITECTURE" class="bio-nav-img bio-nav-img-arch bio-nav-pressed" />
+        </button>
+        <button id="bio-nav-move-btn" class="bio-nav-item bio-nav-move" title="Movement">
+          <img src="assets/nav-movement.png?v=25" alt="< MOVEMENT" class="bio-nav-img bio-nav-img-move bio-nav-normal" />
+          <img src="assets/nav-movement-pressed.png?v=25" alt="< MOVEMENT" class="bio-nav-img bio-nav-img-move bio-nav-pressed" />
+        </button>
+        <button id="bio-nav-wave-btn" class="bio-nav-item bio-nav-wave" title="Toggle Menu" aria-label="Toggle Menu">
+          <img src="assets/nav-wave.png?v=27" alt="≈" class="bio-nav-img bio-nav-img-wave bio-nav-normal" />
+          <img src="assets/nav-wave-pressed.png?v=27" alt="≈" class="bio-nav-img bio-nav-img-wave bio-nav-pressed" />
+        </button>
+      </nav>
+    </header>
+
+    <!-- Floating Menu (Image 13 Reference - No Background Geometry) -->
+    <nav class="floating-menu is-hidden" id="floating-menu" aria-label="Floating Navigation Menu" aria-hidden="true">
+      <div class="floating-menu-list">
+        <button class="floating-menu-btn" id="menu-btn-sketch" data-menu="sketch" aria-label="Sketch">
+          <img src="assets/menu-sketch.png?v=27" alt="Sketch" class="floating-menu-img menu-normal" />
+          <img src="assets/menu-sketch-pressed.png?v=27" alt="Sketch" class="floating-menu-img menu-pressed" />
+        </button>
+        <button class="floating-menu-btn" id="menu-btn-capture" data-menu="capture" aria-label="Capture">
+          <img src="assets/menu-capture.png?v=27" alt="Capture" class="floating-menu-img menu-normal" />
+          <img src="assets/menu-capture-pressed.png?v=27" alt="Capture" class="floating-menu-img menu-pressed" />
+        </button>
+        <button class="floating-menu-btn" id="menu-btn-conversations" data-menu="conversations" aria-label="Conversations">
+          <img src="assets/menu-conversations.png?v=27" alt="Conversations" class="floating-menu-img menu-normal" />
+          <img src="assets/menu-conversations-pressed.png?v=27" alt="Conversations" class="floating-menu-img menu-pressed" />
+        </button>
+        <button class="floating-menu-btn" id="menu-btn-memo" data-menu="memo" aria-label="Memo">
+          <img src="assets/menu-memo.png?v=27" alt="Memo" class="floating-menu-img menu-normal" />
+          <img src="assets/menu-memo-pressed.png?v=27" alt="Memo" class="floating-menu-img menu-pressed" />
+        </button>
+        <div class="floating-menu-gap" aria-hidden="true"></div>
+        <button class="floating-menu-btn floating-menu-bio" id="menu-btn-bio" data-menu="bio" aria-label="Back to Bio">
+          <img src="assets/menu-back-to-bio.png?v=27" alt="Back to Bio" class="floating-menu-img menu-normal" />
+          <img src="assets/menu-back-to-bio-pressed.png?v=27" alt="Back to Bio" class="floating-menu-img menu-pressed" />
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Architectural Stage (Contains Body Statements + Right-side Interactive Anchors) -->
+    <section class="bio-stage" id="bio-stage">
+      
+      <!-- 1. BIO BODY TEXTS (Shown on Bio Landing Page) -->
+      <div class="bio-body-group is-active" id="bio-body-group">
+        <div class="bio-statement bio-stmt-1">
+          <p>I major in architecture and create</p>
+          <p>dance workshops</p>
+          <p>that explore architecture x movement</p>
+        </div>
+
+        <div class="bio-statement bio-stmt-2">
+          <p>Studied Bouwkunde (Architecture)</p>
+          <p>building engineering</p>
+          <p>2023-2026 in Dutch</p>
+        </div>
+
+        <div class="bio-statement bio-stmt-3">
+          <p>7 years of contemporary</p>
+          <p>dance and figure skating</p>
+        </div>
+
+        <div class="bio-statement bio-stmt-4">
+          <p>Born in Seoul,</p>
+          <p>raised in the Netherlands</p>
+          <p>and Germany</p>
+        </div>
+      </div>
+
+      <!-- 2. EDUCATION BODY TEXTS (Shown on Education Landing Page) -->
+      <div class="edu-body-group is-hidden" id="edu-body-group" aria-hidden="true">
+        <div class="edu-item edu-item-6">
+          <p class="edu-line">6. Bachelor of Architecture ...</p>
+          <p class="edu-line">... University of Melbourne 2025</p>
+        </div>
+
+        <div class="edu-item edu-item-5">
+          <p class="edu-line">5. LDE Sustainability</p>
+          <p class="edu-line edu-indent-1">Honours Programme ...</p>
+          <p class="edu-line edu-indent-2">... TU Delft, Leiden University, Erasmus</p>
+          <p class="edu-line edu-indent-3">University 2024 - 2025</p>
+        </div>
+
+        <div class="edu-item edu-item-4">
+          <p class="edu-line">4. Bachelor of Science in Architecture ...</p>
+          <p class="edu-line">... TU Delft 2023 - 2026</p>
+        </div>
+
+        <div class="edu-item edu-item-3">
+          <p class="edu-line">3. International Baccalaureate (IB)</p>
+          <p class="edu-line">Diploma ...</p>
+          <p class="edu-line edu-indent-frankfurt">... Frankfurt International School</p>
+          <p class="edu-line edu-indent-years">2017 - 2023</p>
+        </div>
+
+        <div class="edu-item edu-item-2">
+          <p class="edu-line">2. Investin - Architecture ...</p>
+          <p class="edu-line edu-indent-london">... London 2022</p>
+        </div>
+
+        <div class="edu-item edu-item-1">
+          <p class="edu-line">1. Global Online Academy - Architecture ...</p>
+          <p class="edu-line edu-indent-remote">... Remote 2021</p>
+        </div>
+      </div>
+
+      <!-- 3. CONTACT BODY TEXTS (Shown on Contact Landing Page - Image 7) -->
+      <div class="contact-body-group is-hidden" id="contact-body-group" aria-hidden="true">
+        <div class="contact-stmt-block">
+          <p class="contact-line">Do you have any input?</p>
+          <p class="contact-line">Or just want to keep in contact?</p>
+          <p class="contact-line contact-gap">Email is best to keep it organized!</p>
+          <p class="contact-line">Reach me at <a href="#" class="contact-email-link" data-email-user="v0ault.ma" data-email-domain="gmail.com">v0ault.ma [at] gmail [dot] com</a></p>
+        </div>
+      </div>
+
+      <!-- 4. ARCHITECTURE PHOTO ALBUM DECK (Pure Image Frames - Image 8 Reference) -->
+      <div class="arch-body-group is-hidden" id="arch-body-group" aria-hidden="true">
+        <div class="arch-album-container" id="arch-album-container" tabindex="0" role="region" aria-label="Architecture Photo Album Deck">
+          <div class="arch-deck" id="arch-deck">
+            
+            <!-- Frame 01 (Project 010) -->
+            <article class="arch-card" data-index="0" data-project-id="010" aria-label="Architecture Frame 01 - The Balance">
+              <div class="arch-card-title-header">THE BALANCE</div>
+              <img src="architectureprojectpage_images/010/arch_010_01_cover.png" alt="The Balance" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 02 (Project 009) -->
+            <article class="arch-card" data-index="1" data-project-id="009" aria-label="Architecture Frame 02 - Zwembad Found">
+              <div class="arch-card-title-header">ZWEMBAD FOUND</div>
+              <img src="architectureprojectpage_images/009/arch_009_01_cover.png" alt="Zwembad Found" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 03 (Project 008) -->
+            <article class="arch-card" data-index="2" data-project-id="008" aria-label="Architecture Frame 03 - The Sea of Crying Eyes">
+              <div class="arch-card-title-header">THE SEA OF CRYING EYES</div>
+              <img src="architectureprojectpage_images/008/arch_008_01_cover.png" alt="The Sea of Crying Eyes" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 04 (Project 007) -->
+            <article class="arch-card" data-index="3" data-project-id="007" aria-label="Architecture Frame 04 - House of Honest Light">
+              <div class="arch-card-title-header">HOUSE OF HONEST LIGHT</div>
+              <img src="architectureprojectpage_images/007/arch_007_01.png" alt="House of Honest Light" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 05 (Project 006) -->
+            <article class="arch-card" data-index="4" data-project-id="006" aria-label="Architecture Frame 05 - Field Engraved">
+              <div class="arch-card-title-header">FIELD ENGRAVED</div>
+              <img src="architectureprojectpage_images/006/arch_006_01_cover.png" alt="Field Engraved" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 06 (Project 005) -->
+            <article class="arch-card" data-index="5" data-project-id="005" aria-label="Architecture Frame 06 - Studio HOB">
+              <div class="arch-card-title-header">STUDIO HOB</div>
+              <img src="architectureprojectpage_images/005/arch_005_01_cover.png" alt="Studio HOB" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 07 (Project 004) -->
+            <article class="arch-card" data-index="6" data-project-id="004" aria-label="Architecture Frame 07 - Escher Museum pavilion AI optimization">
+              <div class="arch-card-title-header">ESCHER MUSEUM PAVILION AI OPTIMIZATION</div>
+              <img src="architectureprojectpage_images/004/arch_004_01.png" alt="Escher Museum pavilion AI optimization" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 08 (Project 003) -->
+            <article class="arch-card" data-index="7" data-project-id="003" aria-label="Architecture Frame 08 - Rustwijk Urban Development Proposal Meeslaan">
+              <div class="arch-card-title-header">RUSTWIJK URBAN DEVELOPMENT PROPOSAL MEESLAAN</div>
+              <img src="architectureprojectpage_images/003/arch_003_01.png" alt="Rustwijk Urban Development Proposal Meeslaan" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 09 (Project 002) -->
+            <article class="arch-card" data-index="8" data-project-id="002" aria-label="Architecture Frame 09 - Form study | The collage:  Uplifting form of nature">
+              <div class="arch-card-title-header">FORM STUDY | THE COLLAGE: UPLIFTING FORM OF NATURE</div>
+              <img src="architectureprojectpage_images/002/arch_002_01.png" alt="Form study | The collage:  Uplifting form of nature" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <!-- Frame 10 (Project 001) -->
+            <article class="arch-card" data-index="9" data-project-id="001" aria-label="Architecture Frame 10 - Form study | The Wall:  The blended Fibonacci">
+              <div class="arch-card-title-header">FORM STUDY | THE WALL: THE BLENDED FIBONACCI</div>
+              <img src="architectureprojectpage_images/001/ov3.png" alt="Form study | The Wall:  The blended Fibonacci" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5. ARCHITECTURE PROJECT PAGE (Image 10 Reference) -->
+      <div class="arch-project-group is-hidden" id="arch-project-group" aria-hidden="true">
+        <div class="arch-proj-container">
+
+          <!-- A. Hero Banner with Project Title Overlay (Full Window Backdrop) -->
+          <div class="arch-proj-hero hero-fit-wallpaper" id="arch-proj-hero" style="background-color: #000000;">
+            <img src="architectureprojectpage_images/001/ov3.png" alt="Form study | The Wall:  The blended Fibonacci" class="arch-proj-hero-img" id="arch-proj-hero-img" />
+            <div class="arch-proj-hero-overlay">
+              <div class="arch-proj-titles">
+                <h1 class="arch-proj-title" id="arch-proj-title">Form study | The Wall:  The blended Fibonacci</h1>
+              </div>
+              <div class="arch-proj-num" id="arch-proj-num">001</div>
+            </div>
+          </div>
+
+          <!-- Editorial Body Content Below Backdrop (fills edges on large monitors) -->
+          <div class="arch-proj-body-content">
+
+            <!-- B. Horizontal Filmstrip Carousel of Project Thumbnails (Shifted to top) -->
+            <div class="arch-proj-filmstrip" id="arch-proj-filmstrip" role="region" aria-label="Project Image Thumbnails">
+              <div class="arch-film-thumb is-active" data-slide="0" role="button" tabindex="0" aria-label="Slide 1 - Perspective View" style="aspect-ratio: 2656 / 1768;"><img src="architectureprojectpage_images/001/ov3.png" alt="Form study | The Wall - Perspective View" /></div>
+              <div class="arch-film-thumb" data-slide="1" role="button" tabindex="0" aria-label="Slide 2 - Top Plan View" style="aspect-ratio: 3196 / 746;"><img src="architectureprojectpage_images/001/ov31.png" alt="Form study | The Wall - Top Plan View" /></div>
+              <div class="arch-film-thumb" data-slide="2" role="button" tabindex="0" aria-label="Slide 3 - Proportion Diagram" style="aspect-ratio: 2984 / 1192;"><img src="architectureprojectpage_images/001/ov32.png" alt="Form study | The Wall - Proportion Diagram" /></div>
+              <div class="arch-film-thumb" data-slide="3" role="button" tabindex="0" aria-label="Slide 4 - Side Elevation Profile" style="aspect-ratio: 1754 / 2096;"><img src="architectureprojectpage_images/001/ov33.png" alt="Form study | The Wall - Side Elevation Profile" /></div>
+            </div>
+
+            <!-- C. Project Description & Metadata Grid -->
+            <div class="arch-proj-meta-grid">
+              <div class="arch-proj-meta-left">
+                <h3 class="arch-proj-section-heading">PROJECT DESCRIPTION</h3>
+              </div>
+              <div class="arch-proj-meta-right">
+                <div class="arch-specs-table">
+                  <div class="arch-spec-row" style="display: none;">
+                    <span class="arch-spec-key">location</span>
+                    <span class="arch-spec-val" id="arch-spec-location"></span>
+                  </div>
+                  <div class="arch-spec-row">
+                    <span class="arch-spec-key">design</span>
+                    <span class="arch-spec-val" id="arch-spec-design">Vivian Park</span>
+                  </div>
+                  <div class="arch-spec-row">
+                    <span class="arch-spec-key">year</span>
+                    <span class="arch-spec-val" id="arch-spec-year">2023</span>
+                  </div>
+                  <div class="arch-spec-row" style="display: none;">
+                    <span class="arch-spec-key">program</span>
+                    <span class="arch-spec-val" id="arch-spec-status"></span>
+                  </div>
+                </div>
+                <p class="arch-proj-intro-para" id="arch-proj-intro-para">
+                  To translate the mathematical beauty of the Fibonacci sequence into a sculptural, translucent wall, exploring the relationship between natural proportions, spatial depth in a continuous form.
+                </p>
+              </div>
+            </div>
+
+            <!-- E. Dual-Column Imagery & Description Grid -->
+            <div class="arch-proj-content-grid">
+              
+              <!-- Left Column: Primary Portrait Feature & Text -->
+              <div class="arch-proj-col-left">
+                <div class="arch-proj-primary-img-frame" id="arch-proj-primary-img-frame">
+                  <img src="architectureprojectpage_images/001/ov3.png" alt="Form study | The Wall:  The blended Fibonacci" class="arch-proj-primary-img" id="arch-proj-primary-img" />
+                </div>
+                <div class="arch-proj-img-controls">
+                  <span class="arch-proj-img-counter" id="arch-proj-img-counter">1/4</span>
+                  <div class="arch-proj-img-arrows">
+                    <button type="button" class="arch-arrow-btn arch-arrow-prev" id="arch-arrow-prev" aria-label="Previous Slide">&lt;</button>
+                    <button type="button" class="arch-arrow-btn arch-arrow-next" id="arch-arrow-next" aria-label="Next Slide">&gt;</button>
+                  </div>
+                </div>
+                <p class="arch-proj-body-para" id="arch-proj-body-para">
+                  To achieve this sculptural structure, acrylic panels were cut into triangles to replicate glass panes which then were positioned protruding beyond a single z-y plane in the fibonacci sequence. Each triangle was carefuly measured for not only its height but its distance across the horizontal plane to give the wall a greater volume than simply its glass thickness. In addition, the vertical glass walls are linked framelessly with three hand etched panel of arcylic, replicating translucent glass, appearing as a separate element from the transparent front wall glass.
+                </p>
+              </div>
+
+              <!-- Right Column: Extra information / secondary text -->
+              <div class="arch-proj-col-right" id="arch-proj-col-right" aria-hidden="true"></div>
+
+            </div>
+
+            <!-- Bottom Return Link / Back to Album Deck -->
+            <div class="arch-proj-back-bar">
+              <button class="arch-proj-back-btn" id="arch-proj-back-btn">
+                &lt; RETURN TO ARCHITECTURE VAULT
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Movement Sub-Page Group (Never-ending Scrolling Deck) -->
+      <div class="arch-body-group move-body-group is-hidden" id="move-body-group" aria-hidden="true">
+        <div class="arch-album-container" id="move-album-container" tabindex="0" role="region" aria-label="Movement Vault 3D Photo Album">
+          <div class="arch-deck" id="move-deck">
+
+            <article class="arch-card move-card" data-index="0" data-project-id="heights-of-a-house" aria-label="Movement Frame 01 - Heights of a House">
+              <div class="arch-card-title-header">HEIGHTS OF A HOUSE</div>
+              <img src="movementprojectpage_images/heights_of_a_house/cover.png" alt="Heights of a House" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <article class="arch-card move-card" data-index="1" data-project-id="human-systems" aria-label="Movement Frame 02 - Human Systems">
+              <div class="arch-card-title-header">HUMAN SYSTEMS</div>
+              <img src="movementprojectpage_images/human_systems/cover.png" alt="Human Systems" class="arch-card-img" />
+              <div class="arch-card-click-prompt" aria-hidden="true"><span class="arch-card-click-prompt-text">click to view</span></div>
+            </article>
+
+            <article class="arch-card move-card is-placeholder" data-index="2" aria-label="Movement Frame 03 - Imagined Spaces">
+              <div class="arch-card-title-header">IMAGINED SPACES</div>
+              <div class="conversation-card-placeholder">
+                <span class="conversation-card-placeholder-text">coming soon</span>
+              </div>
+            </article>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5B. MOVEMENT PROJECT PAGE (No Filmstrip, Single Full-Page Hero Image, End of Page Images) -->
+      <div class="arch-project-group move-project-group is-hidden" id="move-project-group" aria-hidden="true">
+        <div class="arch-proj-container">
+
+          <!-- A. Hero Banner with Project Title Overlay (Single Full-Page Hero Image or Video, No Filmstrip, No Numbers) -->
+          <div class="arch-proj-hero hero-fit-wallpaper" id="move-proj-hero" style="background-color: #000000;">
+            <img src="assets/placeholder-grey.png" alt="Heights of a House" class="arch-proj-hero-img" id="move-proj-hero-img" />
+            <video class="arch-proj-hero-video is-hidden" id="move-proj-hero-video" autoplay loop muted playsinline preload="auto"></video>
+            <div class="arch-proj-hero-overlay">
+              <div class="arch-proj-titles">
+                <h1 class="arch-proj-title" id="move-proj-title">Heights of a House</h1>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editorial Body Content Below Backdrop -->
+          <div class="arch-proj-body-content">
+
+            <!-- C. Project Description & Metadata Grid (No location, design, or program rows) -->
+            <div class="arch-proj-meta-grid">
+              <div class="arch-proj-meta-left">
+                <h3 class="arch-proj-section-heading">PROJECT DESCRIPTION</h3>
+              </div>
+              <div class="arch-proj-meta-right">
+                <div class="arch-specs-table">
+                  <div class="arch-spec-row" id="move-spec-row-year" style="display: none;">
+                    <span class="arch-spec-key">year</span>
+                    <span class="arch-spec-val" id="move-spec-year"></span>
+                  </div>
+                </div>
+                <p class="arch-proj-intro-para" id="move-proj-intro-para"></p>
+              </div>
+            </div>
+
+            <!-- E. Dual-Column Imagery & Description Grid -->
+            <div class="arch-proj-content-grid">
+              
+              <!-- Left Column: Primary Portrait Feature & Text -->
+              <div class="arch-proj-col-left">
+                <div class="arch-proj-primary-img-frame" id="move-proj-primary-img-frame">
+                  <img src="assets/placeholder-grey.png" alt="Heights of a House" class="arch-proj-primary-img" id="move-proj-primary-img" />
+                </div>
+                <div class="arch-proj-img-controls" id="move-proj-img-controls">
+                  <span class="arch-proj-img-counter" id="move-proj-img-counter">1/1</span>
+                  <div class="arch-proj-img-arrows">
+                    <button type="button" class="arch-arrow-btn arch-arrow-prev" id="move-arrow-prev" aria-label="Previous Slide">&lt;</button>
+                    <button type="button" class="arch-arrow-btn arch-arrow-next" id="move-arrow-next" aria-label="Next Slide">&gt;</button>
+                  </div>
+                </div>
+                <p class="arch-proj-body-para" id="move-proj-body-para"></p>
+              </div>
+
+              <!-- Right Column: Extra information / secondary text -->
+              <div class="arch-proj-col-right" id="move-proj-col-right" aria-hidden="true"></div>
+
+            </div>
+
+            <!-- Bottom Return Link / Back to Movement Album Deck -->
+            <div class="arch-proj-back-bar">
+              <button class="arch-proj-back-btn" id="move-proj-back-btn">
+                &lt; RETURN TO MOVEMENT VAULT
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sketch Landing Page (Image 14 Reference - Unusual Object Sketches) -->
+      <div class="arch-body-group sketch-body-group is-hidden" id="sketch-body-group" aria-hidden="true">
+        <div class="sketch-stage" id="sketch-stage">
+          
+          <!-- Left Column: Title & Dynamic Info Panel (Aligned Higher) -->
+          <div class="sketch-left-panel">
+            <h1 class="sketch-main-title">UNUSUAL OBJECT SKETCHES</h1>
+            
+            <div class="sketch-info-box" id="sketch-info-box">
+              <h2 class="sketch-sub-title" id="sketch-sub-title">Internet &amp; Plant pot</h2>
+              <p class="sketch-sub-desc" id="sketch-sub-desc">Affected by the weight of hard plastic, the plant continues to grow. Though its restraining materials are static, the plant continues to breathe. Both are containers, the internet box and the plant pot. One stores nanoscopic components, the other stores microscopic cells. It&#39;s quite clear which container holds an adaptive object.</p>
+            </div>
+          </div>
+
+          <!-- Right Column: Vertical Flick Stream / Deck -->
+          <div class="sketch-deck-viewport" id="sketch-deck-viewport">
+            <div class="sketch-card-stack" id="sketch-card-stack">
+              <div class="sketch-card is-active" data-index="0">
+                <img src="sketchpage_images/sketch_01.png?v=57" alt="Internet &amp; Plant pot" loading="eager" />
+              </div>
+              <div class="sketch-card is-next" data-index="1">
+                <img src="sketchpage_images/sketch_02.png?v=57" alt="Nail &amp; Eraser" loading="eager" />
+              </div>
+              <div class="sketch-card" data-index="2">
+                <img src="sketchpage_images/sketch_03.png?v=57" alt="Coffee &amp; Sleepmask" loading="eager" />
+              </div>
+              <div class="sketch-card is-prev" data-index="3">
+                <img src="sketchpage_images/sketch_04.png?v=57" alt="Wooden log &amp; plastered interior wall" loading="eager" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Capture Landing Page (Image 15 Reference - Photography) -->
+      <div class="capture-body-group is-hidden" id="capture-body-group" aria-hidden="true">
+        <div class="capture-stage" id="capture-stage">
+          
+          <!-- Left Column: Title & Subtitle (Aligned Higher matching Image 15 & Sketch Page) -->
+          <div class="capture-left-panel">
+            <h1 class="capture-main-title">PHOTOGRAPHY</h1>
+            <h2 class="capture-sub-title" id="capture-sub-title"><span class="capture-label-name">Fenix</span> <span class="capture-label-location">&lt;&nbsp;Rotterdam, The Netherlands&nbsp;&gt;</span></h2>
+          </div>
+
+          <!-- Right Column: Vertical Photo Stream (Image 15) -->
+          <div class="capture-feed-viewport" id="capture-feed-viewport">
+            <div class="capture-photo-stream" id="capture-photo-stream">
+              <div class="capture-photo-card" data-index="0" data-label="Fenix &lt; Rotterdam, The Netherlands &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_37.png?v=57" alt="IMG_5967 2" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="1" data-label="Breese street &lt; Brunswick, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_12.jpg?v=57" alt="DSC04174" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="2" data-label="Cheongsudang Bakery &lt; Jongno, Seoul, South Korea &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_34.png?v=57" alt="IMG_2113" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="3" data-label="Gallarija &lt; Sliema, Malta &gt;" style="--ar: 0.785; aspect-ratio: 2534 / 3228;">
+                <img src="capturepage_photos/photo_01.jpeg?v=57" alt="FullSizeRender (3)" loading="eager" />
+              </div>
+              <div class="capture-photo-card" data-index="4" data-label="4th ARR &lt; Paris, France &gt;" style="--ar: 0.7501; aspect-ratio: 2852 / 3802;">
+                <img src="capturepage_photos/photo_38.png?v=57" alt="IMG_7360 2" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="5" data-label="Opera House &lt; Sydney, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1887 / 2516;">
+                <img src="capturepage_photos/photo_21.png?v=57" alt="DSC05117" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="6" data-label="SNU Museum of Art &lt; Seoul, South Korea &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_15.png?v=57" alt="DSC04621" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="7" data-label="Shrine of Remembrance &lt; Melbourne, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_08.jpg?v=57" alt="DSC03872" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="8" data-label="The Domain &lt; Sydney, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_19.jpg?v=57" alt="DSC05100" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="9" data-label="Bennelong &lt; Sydney, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_22.jpg?v=57" alt="DSC05127" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="10" data-label="Jongmyo Shrine &lt; Seoul Jongno, South Korea &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_13.jpg?v=57" alt="DSC04319" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="11" data-label="State Library Victoria &lt; Melbourne CBD, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_07.jpg?v=57" alt="DSC03583" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="12" data-label="Mercury Tower &lt; St Julian's, Malta &gt;" style="--ar: 1.7743; aspect-ratio: 3648 / 2056;">
+                <img src="capturepage_photos/photo_06.jpg?v=57" alt="DSC03208" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="13" data-label="Philharmonie &lt; 19th ARR. Paris, France &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_02.jpg?v=57" alt="DSC05537" loading="eager" />
+              </div>
+              <div class="capture-photo-card" data-index="14" data-label="UTS Business School &lt; Sydney, Australia &gt;" style="--ar: 0.5625; aspect-ratio: 1458 / 2592;">
+                <img src="capturepage_photos/photo_24.png?v=57" alt="DSC05195" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="15" data-label="MPavilion &lt; Melbourne, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_16.jpg?v=57" alt="DSC04843" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="16" data-label="Brunswick yard &lt; Brunswick, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_11.jpg?v=57" alt="DSC04158" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="17" data-label="Seosomun Shrine History Museum &lt; Seoul, South Korea &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_40.jpeg?v=57" alt="IMG_8448" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="18" data-label="Jubilee Bridge &lt; Singapore &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_36.png?v=57" alt="IMG_5626" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="19" data-label="SNU Museum of Art &lt; Seoul, South Korea &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_29.png?v=57" alt="IMG_0718" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="20" data-label="Yongsan District &lt; Seoul, South Korea &gt;" style="--ar: 0.5626; aspect-ratio: 2093 / 3720;">
+                <img src="capturepage_photos/photo_28.png?v=57" alt="IMG_0271" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="21" data-label="Baebongsan &lt; Seoul, South Korea &gt;" style="--ar: 1.3333; aspect-ratio: 4012 / 3009;">
+                <img src="capturepage_photos/photo_41.png?v=57" alt="IMG_8609" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="22" data-label="Naala Badu &lt; Sydney, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_18.jpg?v=57" alt="DSC05055" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="23" data-label="Balam Balam Place &lt; Brunswick, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_09.jpg?v=57" alt="DSC04118" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="24" data-label="Parliament Building &lt; Valletta, Malta &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_35.jpeg?v=57" alt="IMG_2707" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="25" data-label="Mercury Tower &lt; St Julian's, Malta &gt;" style="--ar: 0.5636; aspect-ratio: 2056 / 3648;">
+                <img src="capturepage_photos/photo_04.png?v=57" alt="DSC02940" loading="eager" />
+              </div>
+              <div class="capture-photo-card" data-index="26" data-label="Yunseul &lt; Seoul, South Korea &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_42.jpeg?v=57" alt="IMG_8670" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="27" data-label="Musée du quai Branly &lt; 7th ARR Paris, France &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_30.png?v=57" alt="IMG_0830" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="28" data-label="Balam Balam Place &lt; Brunswick, Australia &gt;" style="--ar: 0.7304; aspect-ratio: 1896 / 2596;">
+                <img src="capturepage_photos/photo_10.png?v=57" alt="DSC04144" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="29" data-label="Gallarija &lt; Valletta, Malta &gt;" style="--ar: 0.5636; aspect-ratio: 2056 / 3648;">
+                <img src="capturepage_photos/photo_05.jpg?v=57" alt="DSC03077" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="30" data-label="Seosomun Shrine History Museum &lt; Seoul, South Korea &gt;" style="--ar: 1.3333; aspect-ratio: 4032 / 3024;">
+                <img src="capturepage_photos/photo_39.jpeg?v=57" alt="IMG_8437" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="31" data-label="Lostone &lt; Yeongdeungpo, Seoul, South Korea &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_14.png?v=57" alt="DSC04570" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="32" data-label="Governor Phillip Tower &lt; Sydney, Australia &gt;" style="--ar: 0.5625; aspect-ratio: 1458 / 2592;">
+                <img src="capturepage_photos/photo_23.png?v=57" alt="DSC05133" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="33" data-label="Fondation Louis Vuitton &lt; Paris, France &gt;" style="--ar: 0.75; aspect-ratio: 3024 / 4032;">
+                <img src="capturepage_photos/photo_31.png?v=57" alt="IMG_0851" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="34" data-label="Opera House &lt; Sydney, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_20.png?v=57" alt="DSC05109" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="35" data-label="Geumsan-gun &lt; Chungcheongnam-do, South Korea &gt;" style="--ar: 1.7749; aspect-ratio: 3461 / 1950;">
+                <img src="capturepage_photos/photo_26.jpg?v=57" alt="DSC0E2497" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="36" data-label="Les Docks &lt; 13th ARR Paris, France &gt;" style="--ar: 1.3333; aspect-ratio: 4032 / 3024;">
+                <img src="capturepage_photos/photo_32.png?v=57" alt="IMG_1134" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="37" data-label="Shelltoren &lt; Rotterdam, The Netherlands &gt;" style="--ar: 0.6427; aspect-ratio: 1601 / 2491;">
+                <img src="capturepage_photos/photo_33.jpg?v=57" alt="IMG_1542" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="38" data-label="MPavilion &lt; Melbourne, Australia &gt;" style="--ar: 0.75; aspect-ratio: 1944 / 2592;">
+                <img src="capturepage_photos/photo_17.jpg?v=57" alt="DSC04844" loading="lazy" />
+              </div>
+              <div class="capture-photo-card" data-index="39" data-label="Leeum museum of art &lt; Seoul Yongsan, South Korea &gt;" style="--ar: 0.5625; aspect-ratio: 2268 / 4032;">
+                <img src="capturepage_photos/photo_03.png?v=57" alt="IMG_9464" loading="eager" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="40" data-label="Pier Nurimaru APEC House &lt; Busan, South Korea &gt;" style="--ar: 1.7743; aspect-ratio: 3648 / 2056;">
+                <img src="capturepage_photos/photo_27.jpg?v=57" alt="DSC0E2618" loading="lazy" />
+              </div>
+              <div class="capture-photo-card is-landscape" data-index="41" data-label="Government House &lt; Melbourne, Australia &gt;" style="--ar: 1.3333; aspect-ratio: 2592 / 1944;">
+                <img src="capturepage_photos/photo_25.jpg?v=57" alt="DSC05278" loading="lazy" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Scroll Indicator 'v' at the bottom -->
+          <div class="capture-mobile-scroll-indicator" aria-hidden="true">v</div>
+
+        </div>
+      </div>
+
+      <!-- Conversations Landing Page -->
+      <!-- Conversations Landing Page (Image 16 Reference - Collecting Conversations) -->
+      <div class="conversation-body-group is-hidden" id="conversations-body-group" aria-hidden="true">
+        <!-- Desktop Layout (Untouched) -->
+        <div class="conversation-stage conversation-desktop-only" id="conversation-stage">
+          
+          <!-- Left Column: Clear Liquid Bubble with Text (Image 16) -->
+          <div class="conversation-left-panel">
+            <div class="conversation-bubble" id="conversation-bubble">
+              <!-- Liquid Glass Bubble Dynamic SVG Border and Seamless Tail -->
+              <svg class="conversation-bubble-svg" id="conversation-bubble-svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="bubble-stroke-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />
+                    <stop offset="30%" stop-color="rgba(225, 223, 215, 0.75)" />
+                    <stop offset="70%" stop-color="rgba(175, 173, 165, 0.50)" />
+                    <stop offset="100%" stop-color="rgba(145, 143, 135, 0.55)" />
+                  </linearGradient>
+                  <linearGradient id="bubble-fill-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(255, 255, 255, 0.08)" />
+                    <stop offset="45%" stop-color="rgba(255, 255, 255, 0.02)" />
+                    <stop offset="100%" stop-color="rgba(235, 235, 230, 0.05)" />
+                  </linearGradient>
+                  <filter id="bubble-glass-shadow" x="-15%" y="-15%" width="130%" height="130%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0, 0, 0, 0.035)" />
+                    <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0, 0, 0, 0.02)" />
+                  </filter>
+                </defs>
+                <path id="conversation-bubble-path" fill="url(#bubble-fill-sheen)" stroke="url(#bubble-stroke-sheen)" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round" filter="url(#bubble-glass-shadow)" />
+              </svg>
+
+              <div class="conversation-bubble-content">
+                <h1 class="conversation-main-title">COLLECTING CONVERSATIONS</h1>
+                <p class="conversation-intro">
+                  Custom Teo (터) is an attempt to translate the user's story into an embodied home that belongs to them. Through having conversations, the architect becomes the human translator between the users' stories and AI generated visuals.
+                </p>
+                <div class="conversation-quote-block" id="conversation-quote-block">
+                  <h2 class="conversation-author" id="conversation-author">A. J. T. :</h2>
+                  <div class="conversation-quote-lines" id="conversation-quote-lines">
+                    <p class="conversation-quote-line">&lt; It would be nice to relax and check in on my friends and family</p>
+                    <p class="conversation-quote-line">&lt; Pop of color</p>
+                    <p class="conversation-quote-line">&lt; Love a lively festival like the lantern festival</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Vertical Photo Card Stream (Image 16) -->
+          <div class="conversation-feed-viewport" id="conversation-feed-viewport">
+            <div class="conversation-photo-stream" id="conversation-photo-stream">
+              <div class="conversation-card is-active" data-index="0">
+                <img src="conversationpage_images/A.T.jpg" alt="Custom Teo - A. J. T." class="conversation-card-img" />
+              </div>
+              <div class="conversation-card is-placeholder" data-index="1">
+                <div class="conversation-card-placeholder">
+                  <span class="conversation-card-placeholder-text">coming soon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Mobile Layout: Continuous Vertical Scroll Flow -->
+        <div class="conversation-mobile-stage conversation-mobile-only" id="conversation-mobile-stage">
+          
+          <!-- Header (Title & Intro) -->
+          <div class="conversation-mobile-header">
+            <h1 class="conversation-main-title">COLLECTING CONVERSATIONS</h1>
+            <p class="conversation-intro">
+              Custom Teo (터) is an attempt to translate the user's story into an embodied home that belongs to them. Through having conversations, the architect becomes the human translator between the users' stories and AI generated visuals.
+            </p>
+          </div>
+
+          <!-- Project 1: A. J. T. -->
+          <section class="conversation-mobile-project" aria-label="Conversation Project - A. J. T.">
+            <div class="conversation-mobile-bubble" id="mobile-bubble-ajt">
+              <svg class="conversation-mobile-bubble-svg" aria-hidden="true">
+                <path class="conversation-mobile-bubble-path" fill="url(#bubble-fill-sheen)" stroke="url(#bubble-stroke-sheen)" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round" filter="url(#bubble-glass-shadow)" />
+              </svg>
+              <div class="conversation-mobile-bubble-content">
+                <h2 class="conversation-author">A. J. T. :</h2>
+                <div class="conversation-quote-lines">
+                  <p class="conversation-quote-line">&lt; It would be nice to relax and check in on my friends and family</p>
+                  <p class="conversation-quote-line">&lt; Pop of color</p>
+                  <p class="conversation-quote-line">&lt; Love a lively festival like the lantern festival</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- A. J. T. image: same width as frame width, full length seen continuing down -->
+            <div class="conversation-mobile-img-frame">
+              <img src="conversationpage_images/A.T.jpg" alt="Custom Teo - A. J. T." class="conversation-mobile-img" loading="eager" />
+            </div>
+          </section>
+
+          <!-- Space Below & Project 2: K.R. L. -->
+          <section class="conversation-mobile-project conversation-mobile-project-krl" aria-label="Conversation Project - K.R. L.">
+            <div class="conversation-mobile-bubble" id="mobile-bubble-krl">
+              <svg class="conversation-mobile-bubble-svg" aria-hidden="true">
+                <path class="conversation-mobile-bubble-path" fill="url(#bubble-fill-sheen)" stroke="url(#bubble-stroke-sheen)" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round" filter="url(#bubble-glass-shadow)" />
+              </svg>
+              <div class="conversation-mobile-bubble-content">
+                <h2 class="conversation-author">K.R. L. :</h2>
+                <div class="conversation-quote-lines">
+                  <p class="conversation-quote-line">&lt; Faster access to appliances</p>
+                  <p class="conversation-quote-line">&lt; Collective responsibility</p>
+                  <p class="conversation-quote-line">&lt; Privacy</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- K.R. L. Frame (Coming soon placeholder) -->
+            <div class="conversation-mobile-placeholder-frame">
+              <div class="conversation-card-placeholder">
+                <span class="conversation-card-placeholder-text">coming soon</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Memo Landing Page (Image 17 Reference - Memo & Sustainability) -->
+      <div class="memo-body-group is-hidden" id="memo-body-group" aria-hidden="true">
+        <div class="memo-stage" id="memo-stage">
+          
+          <!-- Section 1: Top-Left Text Column -->
+          <div class="memo-left-panel">
+            <h1 class="memo-main-title">MEMO</h1>
+            <h2 class="memo-sub-title">Sustainability and efficiency</h2>
+            <p class="memo-body-text">Sustainability is a widely researched topic in architecture. The construction industry is responsible for a fraction of the total emissions damaging the environment. Therefore this sector attempts to find material solutions and construction solutions to reduce the carbon footprint and make building that use passive energy which will sustain. Others say to be sustainable is to provide efficient solutions to protect people. Therefore concrete is a material that is simple and widely available at low costs. If it produces emissions, it helps sustain the economy and the people short term. If it reduces emissions, it requires huge investment, damages existing industries and is complex. But that’s why it is a difficult topic, to find something that has no negative externalities.</p>
+          </div>
+
+          <!-- Section 2: Right-Aligned Topic Block -->
+          <div class="memo-bottom-right-panel">
+            <h2 class="memo-topic-title">Artificial Intelligence in education and creation</h2>
+            <div class="memo-topic-body">
+              <p class="memo-topic-text">The influence of AI in education should be discussed with more transparency. In education, AI is most tempting and risky, where it takes young learning minds for granted. Where people sign up to learn critical thinking and problem solving skills, using AI to get away with a short term solution can take away our potential as the next generation.</p>
+              <p class="memo-topic-text">Before the invention of calculators humans identified a need for a gadget that calculates quickly, and to fulfill that human desire, calculators were invented by innovative thinkers. We use calculators when we finish school because it is faster, though we understand the reasoning behind some basic math concepts. We don’t use calculators for every life task, it is just suited to simply ‘make calculating faster.’<br />That is the crux. After training students through educational institutions, AI should be used to speed up basic tasks. But for sustained and healthy usage, humans should work on building critical thinking skills. This way, we can make conclusions based on the AI outputs we get.</p>
+              <p class="memo-topic-text">Studies from Harvard and health organisations have carried out tests to observe how AI can assist critical thinking skills of students. The methods used in these tests were successful because the AI was set to not give answers but challenge the students. This education mode on the AI would be an appropriate way to use AI when learning whether we have it on our devices or even in our brains (prediction).</p>
+              <p class="memo-topic-text">Of course AI has immense potential of solving problems through pattern recognition and a set of data. But if we still want to be in charge of handling these technologies, we must be critical and knowledgeable to be at the forefront of the technology. This is why when learning to gain expertise, we must train how to be critical thinkers rather than be dependent on what the AI outputs, even if it is correct. Otherwise it’s almost as feeding a young brain information that is restricted to a few boxes / biases, dissolving the human’s ability to perceive, and react uniquely.</p>
+              <p class="memo-topic-text">Min Jin Lee, author of Pachinko states: If you have someone turn a dial but then divide up those tasks then the time and the money that‘s saved goes to the one who owns the task/the company.<br />This is a crisis for learners because they’re not getting chances.<br />Efficiency can offer much, but we will miss a bigger picture. “As we become more and more deskilled, more and more people are upskilling -&gt; (Upskilling is the process of improving employee skill sets through training and development programs to minimize skill gaps and prepare employees for the new jobs or roles: IBM).”</p>
+              <p class="memo-topic-text">I am writing this because AI emerged in the years while being a student and being in the industry.<br />Using AI is taking the escalator instead of taking the stairs, it can easily make one become dependent on it and students who are less privileged of getting good education are more prone to this dependency. We won’t use the stairs that often but if you are abled, we should learn how to walk up the stairs, before we don’t know how to walk ourselves up a pair of stairs anymore.<br />It gets us moving and thinking.</p>
+              <p class="memo-topic-text memo-topic-part-break">Now for the creation part:</p>
+              <p class="memo-topic-text">This topic has become an everyday thought since I have a deep passion for architecture. There’s mixed opinions in the arts / non arts and I wanted to clarify some misunderstandings. The architecture faculty is the best place to hear two opposing views of AI in one hallway. I heard that AI will take away the job of an artist, but rather than this, I would say AI is a genre of ‘disguised art’ that increases the value of human made art.</p>
+              <p class="memo-topic-text">Art, music, dance, theatre will always be a part of our lives. Most artists reject AI and this is where non artists might assume AI is a cheat code for creating art. But that doesn’t mean artists should throw AI out the window. I saw a poster ruling out the guidelines for using AI in an art class. It stated to use AI to gather inspiration. While I do think this is effective, it only goes as far as researching past cases, or taking from precedents. In architecture, most people do this and it results in a working solution that is socially accepted. What I observe though, is that this does not train an art student to be creative. Creativity is different from gaining information where it does not come from gathering already existing ideas. It comes from the ability of the mind to ponder and given the instantaneous impulse to create.</p>
+              <p class="memo-topic-text">I want to emphasise that in creating art, the “why” should always be relevant, more so if it is something emotional. In the process of creation, we give reason to thousands of decisions on the canvas, and these can all be reasons related to embodiment which are unique to humans.</p>
+              <p class="memo-topic-text">The same story goes with the tool to sing, the tool to build, the tool to draw, the tool to dance. We can make AI do this with technology that continues to develop, but whether its the human maker or the AI tool, it won’t create anything original derived by human desire. A living human with lived experiences who trains to be the creator will sustain and bring out valuable art.</p>
+              <p class="memo-topic-text">And there are different ways to train where AI image generation is their tool, AI voice is their tool, whether its their hand and a paintbrush or their own voice or their hand and the computer mouse. It is the original thought and reasoning that matters behind it.</p>
+              <p class="memo-topic-text">To fulfill the engagement and comfort of every unique person, artist must continue to be the masterminds of creativity. Using full AI is like “asking a cnc machine to make all the structures in the world.”</p>
+            </div>
+          </div>
+
+          <!-- Section 3: Next Topic (Left-aligned) -->
+          <div class="memo-left-panel memo-next-panel">
+            <h2 class="memo-sub-title">Next topic</h2>
+            <p class="memo-body-text">coming soon</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Side Visual Item 1: EDUCATION (Cutout photo A + Label) -->
+      <div class="bio-interactive-item bio-item-education" id="bio-item-education" tabindex="0" role="button" aria-label="Education View">
+        <div class="bio-photo-wrapper photo-wrap-education" id="photo-wrap-education">
+          <img src="assets/photoimageA.png" alt="Vivian - Architecture & Bouwkunde Exhibition" class="bio-photo-img photo-img-education" />
+        </div>
+        <div class="bio-label-wrapper">
+          <h2 class="bio-engraved-title label-education">EDUCATION</h2>
+        </div>
+      </div>
+
+      <!-- Right Side Visual Item 2: CONTACT (Cutout photo B + Label) -->
+      <div class="bio-interactive-item bio-item-contact" id="bio-item-contact" tabindex="0" role="button" aria-label="Contact Information">
+        <div class="bio-photo-wrapper photo-wrap-contact" id="photo-wrap-contact">
+          <img src="assets/photoimageB.png" alt="Vivian - Contact" class="bio-photo-img photo-img-contact" />
+        </div>
+        <div class="bio-label-wrapper">
+          <h2 class="bio-engraved-title label-contact">CONTACT</h2>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Tactile Architectural Popover Modal for Education / Contact -->
+    <div id="bio-modal" class="bio-modal is-closed" aria-hidden="true">
+      <div class="bio-modal-overlay" id="bio-modal-overlay"></div>
+      <div class="bio-modal-card beveled-plate" id="bio-modal-card">
+        <button id="bio-modal-close" class="bio-modal-close-btn" aria-label="Close modal">×</button>
+        <div id="bio-modal-content" class="bio-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- Full-Screen Lightbox / Image Viewer for Architecture Project Bottom Images -->
+    <div id="arch-lightbox" class="arch-lightbox is-closed" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+      <div class="arch-lightbox-backdrop" id="arch-lightbox-backdrop"></div>
+      <button type="button" class="arch-lightbox-close" id="arch-lightbox-close" aria-label="Close image viewer">×</button>
+      <button type="button" class="arch-lightbox-nav arch-lightbox-prev" id="arch-lightbox-prev" aria-label="Previous image">&lt;</button>
+      <div class="arch-lightbox-stage">
+        <img src="" alt="" class="arch-lightbox-img" id="arch-lightbox-img" />
+      </div>
+      <button type="button" class="arch-lightbox-nav arch-lightbox-next" id="arch-lightbox-next" aria-label="Next image">&gt;</button>
+    </div>
+
+  </main>
+
+  <script src="app.js?v=108"></script>
+</body>
+</html>
