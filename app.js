@@ -3014,22 +3014,37 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
     function getSlotStyle(k) {
       let yOffset, zOffset, scale, opacity;
       const vh = window.innerHeight;
+      const isMobile = window.innerWidth <= 860;
       
-      // Foreground image height: about 3/4 the height of the window (untouched)
-      const cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
+      let cardH, headerH, targetSpace, padB, scale3, yOffset3, step;
 
-      // Current distance from header to the visible back image (Card 3)
-      const headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
-      const targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
-      const padB = Math.min(62, Math.max(44, Math.round(vh * 0.055)));
+      if (isMobile) {
+        // Mobile layout: scale card height and stack spacing to fit phone screen dimensions
+        cardH = Math.min(430, Math.max(260, Math.round(vh * 0.52)));
+        headerH = Math.min(54, Math.max(42, Math.round(vh * 0.065)));
+        targetSpace = 12;
+        padB = Math.min(32, Math.max(18, Math.round(vh * 0.038)));
 
-      // Card 0 bottom rests padB above window bottom; Card 3 top sits targetSpace below header
-      const deckBottomFromTop = vh - padB;
-      const card3TargetTopFromTop = headerH + targetSpace;
-      const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
-      const scale3 = 0.81;
-      const yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
-      const step = Math.max(52, Math.round(yOffset3 / 3));
+        const deckBottomFromTop = vh - padB;
+        const card3TargetTopFromTop = headerH + targetSpace;
+        const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
+        scale3 = 0.84;
+        yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
+        step = Math.max(20, Math.min(32, Math.round(yOffset3 / 3)));
+      } else {
+        // Desktop / Monitor layout (100% untouched)
+        cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
+        headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
+        targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
+        padB = Math.min(62, Math.max(44, Math.round(vh * 0.055)));
+
+        const deckBottomFromTop = vh - padB;
+        const card3TargetTopFromTop = headerH + targetSpace;
+        const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
+        scale3 = 0.81;
+        yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
+        step = Math.max(52, Math.round(yOffset3 / 3));
+      }
 
       if (k === 0) {
         yOffset = 0;
@@ -3293,29 +3308,41 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
     // Touch Swipe Navigation for Mobile / Tablets
     let touchStartY = 0;
     let touchStartX = 0;
-    if (albumContainer) {
-      albumContainer.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          touchStartY = e.touches[0].clientY;
-          touchStartX = e.touches[0].clientX;
-        }
-      }, { passive: true });
+    let touchTracking = false;
 
-      albumContainer.addEventListener('touchend', (e) => {
-        if (state.subPage !== 'architecture') return;
-        if (e.changedTouches.length === 1) {
-          const dy = e.changedTouches[0].clientY - touchStartY;
-          const dx = e.changedTouches[0].clientX - touchStartX;
-          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 30) {
-            if (dy < 0) {
-              stepNext(); // Swiped up -> next
-            } else {
-              stepPrev(); // Swiped down -> previous
-            }
+    function onArchTouchStart(e) {
+      if (state.subPage !== 'architecture' || e.touches.length !== 1) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      touchTracking = true;
+    }
+
+    function onArchTouchMove(e) {
+      if (!touchTracking || state.subPage !== 'architecture') return;
+      if (e.cancelable) {
+        e.preventDefault(); // Stop mobile browser from sliding the whole page layout down
+      }
+    }
+
+    function onArchTouchEnd(e) {
+      if (!touchTracking || state.subPage !== 'architecture') return;
+      touchTracking = false;
+      if (e.changedTouches.length === 1) {
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
+          if (dy < 0) {
+            stepNext(); // Swiped up -> next frame
+          } else {
+            stepPrev(); // Swiped down -> previous frame
           }
         }
-      }, { passive: true });
+      }
     }
+
+    window.addEventListener('touchstart', onArchTouchStart, { passive: true });
+    window.addEventListener('touchmove', onArchTouchMove, { passive: false });
+    window.addEventListener('touchend', onArchTouchEnd, { passive: true });
 
     // Pre-decode all cover card images so 3D deck scrolling remains smooth
     function preDecodeDeckImages() {
@@ -3403,22 +3430,37 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
     function getSlotStyle(k) {
       let yOffset, zOffset, scale, opacity;
       const vh = window.innerHeight;
+      const isMobile = window.innerWidth <= 860;
       
-      // Foreground image height: about 3/4 the height of the window (untouched)
-      const cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
+      let cardH, headerH, targetSpace, padB, scale3, yOffset3, step;
 
-      // Current distance from header to the visible back image (Card 3)
-      const headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
-      const targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
-      const padB = Math.min(62, Math.max(44, Math.round(vh * 0.055)));
+      if (isMobile) {
+        // Mobile layout: scale card height and stack spacing to fit phone screen dimensions
+        cardH = Math.min(430, Math.max(260, Math.round(vh * 0.52)));
+        headerH = Math.min(54, Math.max(42, Math.round(vh * 0.065)));
+        targetSpace = 12;
+        padB = Math.min(32, Math.max(18, Math.round(vh * 0.038)));
 
-      // Card 0 bottom rests padB above window bottom; Card 3 top sits targetSpace below header
-      const deckBottomFromTop = vh - padB;
-      const card3TargetTopFromTop = headerH + targetSpace;
-      const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
-      const scale3 = 0.81;
-      const yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
-      const step = Math.max(52, Math.round(yOffset3 / 3));
+        const deckBottomFromTop = vh - padB;
+        const card3TargetTopFromTop = headerH + targetSpace;
+        const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
+        scale3 = 0.84;
+        yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
+        step = Math.max(20, Math.min(32, Math.round(yOffset3 / 3)));
+      } else {
+        // Desktop / Monitor layout (100% untouched)
+        cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
+        headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
+        targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
+        padB = Math.min(62, Math.max(44, Math.round(vh * 0.055)));
+
+        const deckBottomFromTop = vh - padB;
+        const card3TargetTopFromTop = headerH + targetSpace;
+        const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
+        scale3 = 0.81;
+        yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
+        step = Math.max(52, Math.round(yOffset3 / 3));
+      }
 
       if (k === 0) {
         yOffset = 0;
@@ -3683,29 +3725,41 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
     // Touch Swipe Navigation for Mobile / Tablets
     let touchStartY = 0;
     let touchStartX = 0;
-    if (albumContainer) {
-      albumContainer.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          touchStartY = e.touches[0].clientY;
-          touchStartX = e.touches[0].clientX;
-        }
-      }, { passive: true });
+    let touchTracking = false;
 
-      albumContainer.addEventListener('touchend', (e) => {
-        if (state.subPage !== 'movement') return;
-        if (e.changedTouches.length === 1) {
-          const dy = e.changedTouches[0].clientY - touchStartY;
-          const dx = e.changedTouches[0].clientX - touchStartX;
-          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 30) {
-            if (dy < 0) {
-              stepNext();
-            } else {
-              stepPrev();
-            }
+    function onMoveTouchStart(e) {
+      if (state.subPage !== 'movement' || e.touches.length !== 1) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      touchTracking = true;
+    }
+
+    function onMoveTouchMove(e) {
+      if (!touchTracking || state.subPage !== 'movement') return;
+      if (e.cancelable) {
+        e.preventDefault(); // Stop mobile browser from sliding the whole page down
+      }
+    }
+
+    function onMoveTouchEnd(e) {
+      if (!touchTracking || state.subPage !== 'movement') return;
+      touchTracking = false;
+      if (e.changedTouches.length === 1) {
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
+          if (dy < 0) {
+            stepNext(); // Swiped up -> next frame
+          } else {
+            stepPrev(); // Swiped down -> previous frame
           }
         }
-      }, { passive: true });
+      }
     }
+
+    window.addEventListener('touchstart', onMoveTouchStart, { passive: true });
+    window.addEventListener('touchmove', onMoveTouchMove, { passive: false });
+    window.addEventListener('touchend', onMoveTouchEnd, { passive: true });
 
     // Export API
     window.moveAlbumDeckAPI = {

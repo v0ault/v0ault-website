@@ -742,6 +742,11 @@ body {
   pointer-events: none;
 }
 
+.arch-project-group.is-active {
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+
 /* Staggered Bio Statements */
 .bio-statement {
   font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -2342,21 +2347,140 @@ body {
   mix-blend-mode: multiply !important;
 }
 
-/* Mobile Menu: Full viewport backdrop below header while open */
+/* Mobile Responsive Engine: Scaled header, 3D Deck ratio, continuous project scroll, and full-screen menu */
 @media (max-width: 860px) {
+  /* Scaled-down header so menu icon and nav items fit comfortably even on iPhone widths */
   .bio-header {
+    padding: 12px clamp(10px, 3.2vw, 18px) !important;
+    gap: 8px !important;
     z-index: 125 !important;
+    --header-height: clamp(44px, 6.2vh, 52px);
+  }
+
+  .bio-brand-btn {
+    flex-shrink: 0 !important;
+  }
+
+  .bio-brand-img {
+    height: clamp(20px, 5.2vw, 26px) !important;
+    width: auto !important;
+  }
+
+  .bio-header-right {
+    flex-shrink: 0 !important;
+    gap: clamp(8px, 2.2vw, 14px) !important;
+  }
+
+  .bio-nav-item {
+    flex-shrink: 0 !important;
+  }
+
+  .bio-nav-img {
+    height: clamp(12px, 3.2vw, 16px) !important;
+    width: auto !important;
+  }
+
+  .bio-nav-img-wave {
+    height: clamp(14px, 3.8vw, 18px) !important;
+    width: auto !important;
+  }
+
+  /* Architecture & Movement Deck Pages Mobile Ratio & Non-sliding Viewport */
+  .bio-view.is-architecture-deck-page {
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
+
+  .bio-view.is-architecture-deck-page .bio-stage {
+    height: calc(100vh - var(--header-height, 50px)) !important;
+    height: calc(100dvh - var(--header-height, 50px)) !important;
+    min-height: unset !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
+
+  .arch-album-container {
+    min-height: unset !important;
+    max-width: 100% !important;
+    padding-bottom: 16px !important;
+    perspective: 1200px !important;
+    touch-action: none !important;
+  }
+
+  .arch-deck {
+    touch-action: none !important;
+  }
+
+  .arch-card {
+    height: clamp(260px, 52vh, 420px) !important;
+    height: clamp(260px, 52dvh, 420px) !important;
+    touch-action: none !important;
+  }
+
+  /* Architecture & Movement Project Pages Mobile Continuous Scroll */
+  .bio-view.is-project-page {
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  .bio-view.is-project-page .bio-stage {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    padding-bottom: 40px !important;
+  }
+
+  .bio-view.is-project-page .arch-project-group {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .arch-project-group.is-active,
+  .arch-project-group:not(.is-hidden):not(.is-fading-out) {
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+  }
+
+  .arch-proj-container,
+  .arch-proj-hero {
+    touch-action: pan-y !important;
+    pointer-events: auto !important;
+  }
+
+  .arch-proj-hero {
+    height: 100vh !important;
+    height: 100dvh !important;
   }
 
   .floating-menu {
     position: fixed !important;
-    top: var(--header-nav-bottom, 64px) !important;
+    top: var(--header-height, 50px) !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - var(--header-nav-bottom, 64px)) !important;
-    height: calc(100dvh - var(--header-nav-bottom, 64px)) !important;
+    height: calc(100vh - var(--header-height, 50px)) !important;
+    height: calc(100dvh - var(--header-height, 50px)) !important;
     z-index: 120 !important;
     background-color: var(--bg-snow) !important;
     background-image: url('assets/snow-texture.png') !important;
