@@ -1267,6 +1267,15 @@
 
     if (!project) return;
 
+    // Reset project scroll position to top whenever entering or switching projects
+    const archGroupEl = document.getElementById('arch-project-group');
+    const moveGroupEl = document.getElementById('move-project-group');
+    if (archGroupEl) archGroupEl.scrollTop = 0;
+    if (moveGroupEl) moveGroupEl.scrollTop = 0;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     const numEl = document.getElementById('arch-proj-num');
     const titleEl = document.getElementById('arch-proj-title');
     const heroImgEl = document.getElementById('arch-proj-hero-img');
@@ -1817,6 +1826,15 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
     }
 
     if (!project) return;
+
+    // Reset project scroll position to top whenever entering or switching projects
+    const archGroupEl = document.getElementById('arch-project-group');
+    const moveGroupEl = document.getElementById('move-project-group');
+    if (archGroupEl) archGroupEl.scrollTop = 0;
+    if (moveGroupEl) moveGroupEl.scrollTop = 0;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 
     const titleEl = document.getElementById('move-proj-title');
     const heroImgEl = document.getElementById('move-proj-hero-img');
@@ -2694,6 +2712,15 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       if (targetPage === 'architecture' || targetPage === 'movement' || isArchProject || isMoveProject) {
         window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+
+      if (isArchProject || isMoveProject) {
+        const archGroupEl = document.getElementById('arch-project-group');
+        const moveGroupEl = document.getElementById('move-project-group');
+        if (archGroupEl) archGroupEl.scrollTop = 0;
+        if (moveGroupEl) moveGroupEl.scrollTop = 0;
       }
 
       // 1. Fade out current body texts / album
@@ -2721,6 +2748,13 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
             targetGroup.classList.remove('is-fading-out');
             targetGroup.classList.add('is-active');
             isTransitioning = false;
+
+            if (isArchProject || isMoveProject) {
+              targetGroup.scrollTop = 0;
+              window.scrollTo(0, 0);
+              document.documentElement.scrollTop = 0;
+              document.body.scrollTop = 0;
+            }
 
             // If navigating to architecture, refresh card deck positioning and align to active project card
             if (targetPage === 'architecture' && window.archAlbumDeckAPI) {
@@ -3019,18 +3053,18 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       let cardH, headerH, targetSpace, padB, scale3, yOffset3, step;
 
       if (isMobile) {
-        // Mobile layout: scale card height and stack spacing to fit phone screen dimensions
-        cardH = Math.min(430, Math.max(260, Math.round(vh * 0.52)));
-        headerH = Math.min(54, Math.max(42, Math.round(vh * 0.065)));
-        targetSpace = 12;
-        padB = Math.min(32, Math.max(18, Math.round(vh * 0.038)));
+        // Mobile layout: fill screen height nicely, eliminate gap between header and cards
+        cardH = Math.min(580, Math.max(340, Math.round(vh * 0.65)));
+        headerH = Math.min(62, Math.max(48, Math.round(vh * 0.07)));
+        targetSpace = 16;
+        padB = Math.min(42, Math.max(24, Math.round(vh * 0.045)));
 
         const deckBottomFromTop = vh - padB;
         const card3TargetTopFromTop = headerH + targetSpace;
         const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
-        scale3 = 0.84;
+        scale3 = 0.82;
         yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
-        step = Math.max(20, Math.min(32, Math.round(yOffset3 / 3)));
+        step = Math.max(36, Math.round(yOffset3 / 3));
       } else {
         // Desktop / Monitor layout (100% untouched)
         cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
@@ -3435,18 +3469,18 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       let cardH, headerH, targetSpace, padB, scale3, yOffset3, step;
 
       if (isMobile) {
-        // Mobile layout: scale card height and stack spacing to fit phone screen dimensions
-        cardH = Math.min(430, Math.max(260, Math.round(vh * 0.52)));
-        headerH = Math.min(54, Math.max(42, Math.round(vh * 0.065)));
-        targetSpace = 12;
-        padB = Math.min(32, Math.max(18, Math.round(vh * 0.038)));
+        // Mobile layout: fill screen height nicely, eliminate gap between header and cards
+        cardH = Math.min(580, Math.max(340, Math.round(vh * 0.65)));
+        headerH = Math.min(62, Math.max(48, Math.round(vh * 0.07)));
+        targetSpace = 16;
+        padB = Math.min(42, Math.max(24, Math.round(vh * 0.045)));
 
         const deckBottomFromTop = vh - padB;
         const card3TargetTopFromTop = headerH + targetSpace;
         const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
-        scale3 = 0.84;
+        scale3 = 0.82;
         yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
-        step = Math.max(20, Math.min(32, Math.round(yOffset3 / 3)));
+        step = Math.max(36, Math.round(yOffset3 / 3));
       } else {
         // Desktop / Monitor layout (100% untouched)
         cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
@@ -4207,23 +4241,46 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
     // Touch Swipe Navigation for mobile / touch devices
     let touchStartY = 0;
-    sketchGroup.addEventListener('touchstart', (e) => {
+    let touchStartX = 0;
+    let touchTracking = false;
+
+    function onSketchTouchStart(e) {
       if (state.subPage !== 'sketch' || !e.touches.length) return;
       touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+      touchStartX = e.touches[0].clientX;
+      touchTracking = true;
+    }
 
-    sketchGroup.addEventListener('touchend', (e) => {
-      if (state.subPage !== 'sketch' || !e.changedTouches.length) return;
-      const touchEndY = e.changedTouches[0].clientY;
-      const dy = touchEndY - touchStartY;
-      if (Math.abs(dy) > 35) {
+    function onSketchTouchMove(e) {
+      if (!touchTracking || state.subPage !== 'sketch') return;
+      if (e.cancelable) {
+        e.preventDefault(); // Stop mobile browser page scroll
+      }
+    }
+
+    function onSketchTouchEnd(e) {
+      if (!touchTracking || state.subPage !== 'sketch') return;
+      touchTracking = false;
+      if (!e.changedTouches.length) return;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
         if (dy < 0) {
-          stepNext(); // swipe up -> next
+          stepNext(); // swipe up -> next sketch
         } else {
-          stepPrev(); // swipe down -> prev
+          stepPrev(); // swipe down -> prev sketch
         }
       }
-    }, { passive: true });
+    }
+
+    sketchGroup.addEventListener('touchstart', onSketchTouchStart, { passive: true });
+    sketchGroup.addEventListener('touchmove', onSketchTouchMove, { passive: false });
+    sketchGroup.addEventListener('touchend', onSketchTouchEnd, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (state.subPage === 'sketch' && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
 
     // Handle window resize to re-apply poses cleanly
     window.addEventListener('resize', () => {
@@ -4471,23 +4528,46 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
     // Touch Swipe Navigation
     let touchStartY = 0;
-    captureGroup.addEventListener('touchstart', (e) => {
+    let touchStartX = 0;
+    let touchTracking = false;
+
+    function onCaptureTouchStart(e) {
       if (state.subPage !== 'capture' || !e.touches.length) return;
       touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+      touchStartX = e.touches[0].clientX;
+      touchTracking = true;
+    }
 
-    captureGroup.addEventListener('touchend', (e) => {
-      if (state.subPage !== 'capture' || !e.changedTouches.length) return;
-      const touchEndY = e.changedTouches[0].clientY;
-      const dy = touchEndY - touchStartY;
-      if (Math.abs(dy) > 35) {
+    function onCaptureTouchMove(e) {
+      if (!touchTracking || state.subPage !== 'capture') return;
+      if (e.cancelable) {
+        e.preventDefault(); // Stop mobile browser page scroll
+      }
+    }
+
+    function onCaptureTouchEnd(e) {
+      if (!touchTracking || state.subPage !== 'capture') return;
+      touchTracking = false;
+      if (!e.changedTouches.length) return;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
         if (dy < 0) {
           stepNext();
         } else {
           stepPrev();
         }
       }
-    }, { passive: true });
+    }
+
+    captureGroup.addEventListener('touchstart', onCaptureTouchStart, { passive: true });
+    captureGroup.addEventListener('touchmove', onCaptureTouchMove, { passive: false });
+    captureGroup.addEventListener('touchend', onCaptureTouchEnd, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (state.subPage === 'capture' && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
 
     // Handle resize to preserve exact active card center
     window.addEventListener('resize', () => {

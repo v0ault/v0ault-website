@@ -2349,12 +2349,12 @@ body {
 
 /* Mobile Responsive Engine: Scaled header, 3D Deck ratio, continuous project scroll, and full-screen menu */
 @media (max-width: 860px) {
-  /* Scaled-down header so menu icon and nav items fit comfortably even on iPhone widths */
+  /* Moderately scaled header so it is clear, elegant and visible on all mobile screens */
   .bio-header {
-    padding: 12px clamp(10px, 3.2vw, 18px) !important;
+    padding: 14px clamp(12px, 3.6vw, 20px) !important;
     gap: 8px !important;
     z-index: 125 !important;
-    --header-height: clamp(44px, 6.2vh, 52px);
+    --header-height: clamp(50px, 7vh, 60px);
   }
 
   .bio-brand-btn {
@@ -2362,7 +2362,7 @@ body {
   }
 
   .bio-brand-img {
-    height: clamp(20px, 5.2vw, 26px) !important;
+    height: clamp(24px, 6.5vw, 30px) !important;
     width: auto !important;
   }
 
@@ -2376,12 +2376,12 @@ body {
   }
 
   .bio-nav-img {
-    height: clamp(12px, 3.2vw, 16px) !important;
+    height: clamp(16px, 4.3vw, 20px) !important;
     width: auto !important;
   }
 
   .bio-nav-img-wave {
-    height: clamp(14px, 3.8vw, 18px) !important;
+    height: clamp(18px, 4.6vw, 22px) !important;
     width: auto !important;
   }
 
@@ -2398,8 +2398,8 @@ body {
   }
 
   .bio-view.is-architecture-deck-page .bio-stage {
-    height: calc(100vh - var(--header-height, 50px)) !important;
-    height: calc(100dvh - var(--header-height, 50px)) !important;
+    height: calc(100vh - var(--header-height, 54px)) !important;
+    height: calc(100dvh - var(--header-height, 54px)) !important;
     min-height: unset !important;
     padding-bottom: 0 !important;
     overflow: hidden !important;
@@ -2409,7 +2409,7 @@ body {
   .arch-album-container {
     min-height: unset !important;
     max-width: 100% !important;
-    padding-bottom: 16px !important;
+    padding-bottom: 24px !important;
     perspective: 1200px !important;
     touch-action: none !important;
   }
@@ -2419,8 +2419,8 @@ body {
   }
 
   .arch-card {
-    height: clamp(260px, 52vh, 420px) !important;
-    height: clamp(260px, 52dvh, 420px) !important;
+    height: clamp(340px, 65vh, 580px) !important;
+    height: clamp(340px, 65dvh, 580px) !important;
     touch-action: none !important;
   }
 
@@ -2474,13 +2474,13 @@ body {
 
   .floating-menu {
     position: fixed !important;
-    top: var(--header-height, 50px) !important;
+    top: var(--header-height, 54px) !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - var(--header-height, 50px)) !important;
-    height: calc(100dvh - var(--header-height, 50px)) !important;
+    height: calc(100vh - var(--header-height, 54px)) !important;
+    height: calc(100dvh - var(--header-height, 54px)) !important;
     z-index: 120 !important;
     background-color: var(--bg-snow) !important;
     background-image: url('assets/snow-texture.png') !important;
@@ -2517,6 +2517,12 @@ body {
   .floating-menu-btn {
     display: flex !important;
     justify-content: flex-end !important;
+  }
+
+  /* Menu options match same scale as header navigation */
+  .floating-menu-img {
+    height: clamp(16px, 4.3vw, 20px) !important;
+    width: auto !important;
   }
 }
 
@@ -2766,11 +2772,16 @@ img[src*="sketchpage_images"] {
 }
 
 @media (max-width: 860px) {
+  .sketch-body-group {
+    touch-action: none !important;
+    overflow: hidden !important;
+  }
   .sketch-stage {
     flex-direction: column;
     justify-content: flex-start;
-    padding: 90px 20px 24px;
-    overflow-y: auto;
+    padding: clamp(70px, 10vh, 90px) 20px 24px;
+    overflow: hidden !important;
+    touch-action: none !important;
   }
   .sketch-left-panel {
     flex: none;
@@ -2783,10 +2794,12 @@ img[src*="sketchpage_images"] {
     width: 100%;
     height: 52vh;
     min-height: 320px;
+    touch-action: none !important;
   }
   .sketch-card {
     width: 88vw;
     height: 48vh;
+    touch-action: none !important;
   }
 
   /* Fade out the sketch above even more so it is almost invisible */
@@ -2990,11 +3003,16 @@ img[src*="sketchpage_images"] {
 }
 
 @media (max-width: 860px) {
+  .capture-body-group {
+    touch-action: none !important;
+    overflow: hidden !important;
+  }
   .capture-stage {
     flex-direction: column;
     justify-content: flex-start;
-    padding: 90px 20px 24px;
-    overflow-y: auto;
+    padding: clamp(70px, 10vh, 90px) 20px 24px;
+    overflow: hidden !important;
+    touch-action: none !important;
   }
   .capture-left-panel {
     flex: none;
@@ -3007,13 +3025,15 @@ img[src*="sketchpage_images"] {
     right: auto;
     width: 100%;
     height: 60vh;
-    overflow: hidden;
+    overflow: hidden !important;
+    touch-action: none !important;
   }
   .capture-photo-card {
     width: 88vw;
     height: 52vh;
     min-width: unset;
     min-height: unset;
+    touch-action: none !important;
   }
 
   .capture-mobile-scroll-indicator {
@@ -3292,6 +3312,14 @@ img[src*="sketchpage_images"] {
     -webkit-overflow-scrolling: touch !important;
     height: 100vh !important;
     height: 100dvh !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    z-index: 25 !important;
+  }
+
+  .conversation-body-group.is-active {
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
   }
 
   .conversation-mobile-stage {
@@ -3300,8 +3328,10 @@ img[src*="sketchpage_images"] {
     align-items: center !important;
     width: 100% !important;
     min-height: 100% !important;
-    padding: clamp(90px, 14vh, 120px) 6vw clamp(60px, 10vh, 100px) !important;
+    padding: clamp(70px, 10vh, 90px) 6vw clamp(60px, 10vh, 100px) !important;
     box-sizing: border-box !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
   }
 
   .conversation-mobile-header {
