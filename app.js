@@ -3327,11 +3327,11 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       if (Math.abs(wheelDeltaAccumulator) >= WHEEL_THRESHOLD) {
         if (wheelDeltaAccumulator > 0) {
-          // Scroll down -> next project card (silent on wheel)
-          stepNext(false);
-        } else {
-          // Scroll up -> previous project card (silent on wheel)
+          // Scroll down -> cycle to previous project card
           stepPrev(false);
+        } else {
+          // Scroll up -> cycle to next project card
+          stepNext(false);
         }
 
         isWheelLocked = true;
@@ -3362,10 +3362,10 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown') {
         e.preventDefault();
-        stepNext();
+        stepPrev();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
-        stepPrev();
+        stepNext();
       }
     });
 
@@ -3396,9 +3396,9 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         const dx = e.changedTouches[0].clientX - touchStartX;
         if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
           if (dy < 0) {
-            stepNext(); // Swiped up -> next frame
+            stepPrev(); // Swiped up -> previous frame
           } else {
-            stepPrev(); // Swiped down -> previous frame
+            stepNext(); // Swiped down -> next frame
           }
         }
       }
@@ -3744,9 +3744,11 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       if (Math.abs(wheelDeltaAccumulator) >= WHEEL_THRESHOLD) {
         if (wheelDeltaAccumulator > 0) {
-          stepNext(false);
-        } else {
+          // Scroll down -> cycle to previous frame
           stepPrev(false);
+        } else {
+          // Scroll up -> cycle to next frame
+          stepNext(false);
         }
 
         isWheelLocked = true;
@@ -3777,10 +3779,10 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown') {
         e.preventDefault();
-        stepNext();
+        stepPrev();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
-        stepPrev();
+        stepNext();
       }
     });
 
@@ -3811,9 +3813,9 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         const dx = e.changedTouches[0].clientX - touchStartX;
         if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 22) {
           if (dy < 0) {
-            stepNext(); // Swiped up -> next frame
+            stepPrev(); // Swiped up -> previous frame
           } else {
-            stepPrev(); // Swiped down -> previous frame
+            stepNext(); // Swiped down -> next frame
           }
         }
       }
