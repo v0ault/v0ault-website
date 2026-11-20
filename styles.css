@@ -553,27 +553,6 @@ body {
   box-sizing: border-box;
 }
 
-/* When on the Architecture Project Page:
-   The main image is the backdrop of the entire initial screen, and the header sits right on top */
-.bio-view.is-project-page .bio-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 50;
-  background: transparent;
-  pointer-events: none;
-}
-
-.bio-view.is-project-page .bio-header > * {
-  pointer-events: auto;
-}
-
-.bio-view.is-project-page .bio-stage {
-  padding-bottom: 0;
-  min-height: 100vh;
-}
-
 /* Architecture and Movement Deck Pages:
    Lock view height to 100vh so mouse wheel and trackpad scroll smoothly cycles the deck without page-level jitter */
 .bio-view.is-architecture-deck-page {
