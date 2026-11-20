@@ -2238,6 +2238,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       // Once the soft circle expands to fill the screen (~550ms), reveal the Bio page
       setTimeout(() => {
         mainPortfolio.classList.remove('is-hidden');
+        mainPortfolio.classList.add('is-bio-page');
         landingView.classList.add('is-hidden');
 
         setTimeout(() => {
@@ -2264,6 +2265,8 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
           }
 
           window.scrollTo({ top: 0, behavior: 'instant' });
+          const bioGroupEl = document.getElementById('bio-body-group');
+          if (bioGroupEl) bioGroupEl.scrollTop = 0;
         }, 500);
 
       }, 550);
@@ -2352,6 +2355,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         bioGroup.classList.remove('is-fading-out', 'is-hidden');
         bioGroup.classList.add('is-active');
         bioGroup.setAttribute('aria-hidden', 'false');
+        bioGroup.scrollTop = 0;
       }
       if (photoEdu) {
         photoEdu.classList.remove('is-hidden-on-contact', 'is-hidden-on-arch');
@@ -2365,8 +2369,10 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       if (moveNav) moveNav.classList.remove('is-active');
       if (waveNav) waveNav.classList.remove('is-active');
 
-      const bioViewEl = document.getElementById('bio-view');
-      if (bioViewEl) bioViewEl.classList.remove('is-project-page');
+      const bioViewEl = document.getElementById('main-portfolio') || document.querySelector('.bio-view');
+      if (bioViewEl) {
+        bioViewEl.classList.remove('is-project-page', 'is-architecture-deck-page', 'is-bio-page');
+      }
 
       state.subPage = 'bio';
 
@@ -2661,23 +2667,25 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
 
       // Update individual photos visibility for bio/education/contact:
       // Bio: both photos visible
-      // Education: Photo A visible, Photo B hidden
-      // Contact: Photo A hidden, Photo B visible
-      if (photoEdu) {
+      // Education: Photo A visible, Photo B hidden, both text buttons visible
+      // Contact: Photo A hidden, Photo B visible, both text buttons visible
+      const allPhotoEdus = document.querySelectorAll('.photo-wrap-education');
+      allPhotoEdus.forEach(el => {
         if (targetPage === 'contact') {
-          photoEdu.classList.add('is-hidden-on-contact');
+          el.classList.add('is-hidden-on-contact');
         } else {
-          photoEdu.classList.remove('is-hidden-on-contact');
+          el.classList.remove('is-hidden-on-contact');
         }
-      }
+      });
 
-      if (photoContact) {
+      const allPhotoContacts = document.querySelectorAll('.photo-wrap-contact');
+      allPhotoContacts.forEach(el => {
         if (targetPage === 'education') {
-          photoContact.classList.add('is-hidden-on-edu');
+          el.classList.add('is-hidden-on-edu');
         } else {
-          photoContact.classList.remove('is-hidden-on-edu');
+          el.classList.remove('is-hidden-on-edu');
         }
-      }
+      });
 
       // Mutual header toggle:
       // When 'architecture' is active, 'architecture' is pressed, 'movement' is normal.
@@ -2700,7 +2708,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       }
 
       // When on Architecture Project or Movement Project page: toggle full-screen hero backdrop mode
-      const bioViewEl = document.getElementById('bio-view');
+      const bioViewEl = document.getElementById('main-portfolio') || document.querySelector('.bio-view');
       if (bioViewEl) {
         if (isArchProject || isMoveProject) {
           bioViewEl.classList.add('is-project-page');
@@ -2708,6 +2716,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
           bioViewEl.classList.remove('is-project-page');
         }
         bioViewEl.classList.toggle('is-architecture-deck-page', targetPage === 'architecture' || targetPage === 'movement');
+        bioViewEl.classList.toggle('is-bio-page', targetPage === 'bio');
       }
 
       if (targetPage === 'architecture' || targetPage === 'movement' || isArchProject || isMoveProject) {
@@ -2800,6 +2809,11 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
             if (targetPage === 'memo' && targetGroup) {
               targetGroup.scrollTop = 0;
             }
+
+            // Reset bio scroll to top when opening Bio page so Section 1 featured work appears first
+            if (targetPage === 'bio' && bioGroup) {
+              bioGroup.scrollTop = 0;
+            }
           });
         } else {
           isTransitioning = false;
@@ -2844,24 +2858,40 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       });
     }
 
-    // Clicking 'education' -> transitions to Education page
-    if (eduTrigger) {
-      eduTrigger.addEventListener('click', () => {
+    // Clicking 'education' -> transitions to Education page (attaches to all education anchors)
+    const eduTriggers = document.querySelectorAll('.bio-item-education');
+    eduTriggers.forEach(btn => {
+      btn.addEventListener('click', () => {
         if (state.subPage !== 'education') {
           navigateToSubPage('education');
         } else {
           playDebossClickSound();
         }
       });
-    }
+    });
 
-    // Clicking 'contact' -> transitions to Contact page
-    if (contactTrigger) {
-      contactTrigger.addEventListener('click', () => {
+    // Clicking 'contact' -> transitions to Contact page (attaches to all contact anchors)
+    const contactTriggers = document.querySelectorAll('.bio-item-contact');
+    contactTriggers.forEach(btn => {
+      btn.addEventListener('click', () => {
         if (state.subPage !== 'contact') {
           navigateToSubPage('contact');
         } else {
           playDebossClickSound();
+        }
+      });
+    });
+
+    // Bio Featured Work Section scroll hint 'v' smooth scroll to Section 2 (Bio statements)
+    const bioScrollHint = document.getElementById('bio-scroll-hint');
+    if (bioScrollHint) {
+      bioScrollHint.addEventListener('click', () => {
+        playDebossClickSound();
+        const bioContentSection = document.getElementById('bio-content-section');
+        if (bioContentSection && bioGroup) {
+          bioGroup.scrollTo({ top: bioContentSection.offsetTop, behavior: 'smooth' });
+        } else if (bioContentSection) {
+          bioContentSection.scrollIntoView({ behavior: 'smooth' });
         }
       });
     }
@@ -3066,7 +3096,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
         step = Math.max(36, Math.round(yOffset3 / 3));
       } else {
-        // Desktop / Monitor layout (100% untouched)
+        // Desktop / Monitor layout (Architecture Deck 100% untouched)
         cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
         headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
         targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
@@ -3457,10 +3487,8 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
       }
     }
 
-    // Geometry & depth styling for card at relative depth slot k:
-    // Exactly 4 image frames visible at a time (k = 0, 1, 2, 3)
-    // Foreground card height: ~3/4 of window height (74vh)
-    // Visible back card (Card 3) top preserved at a safe distance below the header row
+    // Geometry & depth styling for Movement card at relative depth slot k:
+    // Exactly 3 frames in movement deck with clear space above for the floating motto
     function getSlotStyle(k) {
       let yOffset, zOffset, scale, opacity;
       const vh = window.innerHeight;
@@ -3482,10 +3510,10 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
         step = Math.max(36, Math.round(yOffset3 / 3));
       } else {
-        // Desktop / Monitor layout (100% untouched)
-        cardH = Math.min(860, Math.max(480, Math.round(vh * 0.74)));
+        // Desktop / Monitor layout: motto exception giving clean clearance between header and movement frames
+        cardH = Math.min(840, Math.max(460, Math.round(vh * 0.72)));
         headerH = Math.min(80, Math.max(62, Math.round(vh * 0.075)));
-        targetSpace = Math.min(18, Math.max(12, Math.round(vh * 0.016)));
+        targetSpace = Math.min(48, Math.max(34, Math.round(vh * 0.04))); // Clean breathing space below header and motto
         padB = Math.min(62, Math.max(44, Math.round(vh * 0.055)));
 
         const deckBottomFromTop = vh - padB;
@@ -3493,7 +3521,7 @@ A batch of 5 groups of around 15 grade 1 students, children are given the task t
         const card3TopFromDeckBottom = deckBottomFromTop - card3TargetTopFromTop;
         scale3 = 0.81;
         yOffset3 = card3TopFromDeckBottom - (cardH * scale3);
-        step = Math.max(52, Math.round(yOffset3 / 3));
+        step = Math.max(46, Math.round(yOffset3 / 3));
       }
 
       if (k === 0) {

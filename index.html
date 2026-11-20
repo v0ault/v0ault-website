@@ -8,11 +8,15 @@
   <meta property="og:title" content="V0AULT" />
   <meta property="og:description" content="V0AULT is a design archive dedicated for interdisciplinary pieces involving architecture and movement." />
   
+  <!-- Favicon / Browser Tab & Pinned Tab Icons -->
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=115" />
+  <link rel="apple-touch-icon" href="assets/favicon.png?v=115" />
+
   <!-- Modern Clean Architectural Typography -->
   <link rel="preload" href="fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
   
-  <link rel="stylesheet" href="styles.css?v=110" />
+  <link rel="stylesheet" href="styles.css?v=115" />
 </head>
 <body class="loading-state" data-light-mode="cursor">
 
@@ -116,6 +120,7 @@
           />
         </div>
       </div>
+      <p class="entrance-prompt-text" id="entrance-prompt-text">Tap to open vault</p>
     </div>
   </section>
 
@@ -183,28 +188,94 @@
       
       <!-- 1. BIO BODY TEXTS (Shown on Bio Landing Page) -->
       <div class="bio-body-group is-active" id="bio-body-group">
-        <div class="bio-statement bio-stmt-1">
-          <p>I major in architecture and create</p>
-          <p>dance workshops</p>
-          <p>that explore architecture x movement</p>
-        </div>
+        <!-- Section 1: Featured Work Intro (Smooth Scroll Snapping Section 1) -->
+        <section class="bio-snap-section bio-featured-section" id="bio-featured-section" aria-label="Featured Work">
+          <div class="bio-featured-inner">
+            <h1 class="bio-featured-headline">Hi I'm Vivian Park</h1>
+            <div class="bio-featured-filmstrip-viewport" id="bio-featured-filmstrip-viewport">
+              <div class="bio-featured-filmstrip-track" id="bio-featured-filmstrip-track">
+                <!-- Slide 01: Project 010 (The Balance) -->
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/010/arch_010_01_cover.png" alt="Featured Architecture 010" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <!-- Slide 02: Project 003 -->
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/003/arch_003_01.png" alt="Featured Architecture 003" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <!-- Slide 03: House of Honest Light (Project 007) -->
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/007/arch_007_01.png" alt="Featured Architecture 007" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <!-- Slide 04: Zwembad Found (Project 009) -->
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/009/arch_009_01_cover.png" alt="Featured Architecture 009" class="bio-filmstrip-img" draggable="false" />
+                </div>
 
-        <div class="bio-statement bio-stmt-2">
-          <p>Studied Bouwkunde (Architecture)</p>
-          <p>building engineering</p>
-          <p>2023-2026 in Dutch</p>
-        </div>
+                <!-- Duplicate Loop for Seamless Infinite Marquee -->
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/010/arch_010_01_cover.png" alt="Featured Architecture 010 Loop" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/003/arch_003_01.png" alt="Featured Architecture 003 Loop" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/007/arch_007_01.png" alt="Featured Architecture 007 Loop" class="bio-filmstrip-img" draggable="false" />
+                </div>
+                <div class="bio-filmstrip-cell" aria-hidden="true">
+                  <img src="architectureprojectpage_images/009/arch_009_01_cover.png" alt="Featured Architecture 009 Loop" class="bio-filmstrip-img" draggable="false" />
+                </div>
+              </div>
+            </div>
+            <!-- Bouncing indicator v (same as capture page) prompting visitor to scroll -->
+            <div class="bio-featured-scroll-hint" id="bio-scroll-hint" role="button" tabindex="0" aria-label="Scroll to biography details">v</div>
+          </div>
+        </section>
 
-        <div class="bio-statement bio-stmt-3">
-          <p>7 years of contemporary</p>
-          <p>dance and figure skating</p>
-        </div>
+        <!-- Section 2: Biographical Statements & Education/Contact Anchors (Smooth Scroll Snapping Section 2) -->
+        <section class="bio-snap-section bio-content-section" id="bio-content-section" aria-label="Biography Statements">
+          <div class="bio-statement bio-stmt-1">
+            <p>I major in architecture and create</p>
+            <p>dance workshops</p>
+            <p>that explore architecture x movement</p>
+          </div>
 
-        <div class="bio-statement bio-stmt-4">
-          <p>Born in Seoul,</p>
-          <p>raised in the Netherlands</p>
-          <p>and Germany</p>
-        </div>
+          <div class="bio-statement bio-stmt-2">
+            <p>Studied Bouwkunde (Architecture)</p>
+            <p>building engineering</p>
+            <p>2023-2026 in Dutch</p>
+          </div>
+
+          <div class="bio-statement bio-stmt-3">
+            <p>7 years of contemporary</p>
+            <p>dance and figure skating</p>
+          </div>
+
+          <div class="bio-statement bio-stmt-4">
+            <p>Born in Seoul,</p>
+            <p>raised in the Netherlands</p>
+            <p>and Germany</p>
+          </div>
+
+          <!-- Right Side Visual Item 1: EDUCATION (Cutout photo A + Label) - ONLY on Bio Section 2 -->
+          <div class="bio-interactive-item bio-item-education" id="bio-item-education" tabindex="0" role="button" aria-label="Education View">
+            <div class="bio-photo-wrapper photo-wrap-education" id="photo-wrap-education">
+              <img src="assets/photoimageA.png" alt="Vivian - Architecture & Bouwkunde Exhibition" class="bio-photo-img photo-img-education" />
+            </div>
+            <div class="bio-label-wrapper">
+              <h2 class="bio-engraved-title label-education">EDUCATION</h2>
+            </div>
+          </div>
+
+          <!-- Right Side Visual Item 2: CONTACT (Cutout photo B + Label) - ONLY on Bio Section 2 -->
+          <div class="bio-interactive-item bio-item-contact" id="bio-item-contact" tabindex="0" role="button" aria-label="Contact Information">
+            <div class="bio-photo-wrapper photo-wrap-contact" id="photo-wrap-contact">
+              <img src="assets/photoimageB.png" alt="Vivian - Contact" class="bio-photo-img photo-img-contact" />
+            </div>
+            <div class="bio-label-wrapper">
+              <h2 class="bio-engraved-title label-contact">CONTACT</h2>
+            </div>
+          </div>
+        </section>
       </div>
 
       <!-- 2. EDUCATION BODY TEXTS (Shown on Education Landing Page) -->
@@ -242,6 +313,26 @@
           <p class="edu-line">1. Global Online Academy - Architecture ...</p>
           <p class="edu-line edu-indent-remote">... Remote 2021</p>
         </div>
+
+        <!-- Education Subpage Visual Anchor 1: EDUCATION (Photo A + Label) -->
+        <div class="bio-interactive-item bio-item-education is-subpage-anchor" tabindex="0" role="button" aria-label="Education View">
+          <div class="bio-photo-wrapper photo-wrap-education">
+            <img src="assets/photoimageA.png" alt="Vivian - Architecture & Bouwkunde Exhibition" class="bio-photo-img photo-img-education" />
+          </div>
+          <div class="bio-label-wrapper">
+            <h2 class="bio-engraved-title label-education">EDUCATION</h2>
+          </div>
+        </div>
+
+        <!-- Education Subpage Visual Anchor 2: CONTACT (Photo B hidden, Text button always visible) -->
+        <div class="bio-interactive-item bio-item-contact is-subpage-anchor" tabindex="0" role="button" aria-label="Contact Information">
+          <div class="bio-photo-wrapper photo-wrap-contact is-hidden-on-edu">
+            <img src="assets/photoimageB.png" alt="Vivian - Contact" class="bio-photo-img photo-img-contact" />
+          </div>
+          <div class="bio-label-wrapper">
+            <h2 class="bio-engraved-title label-contact">CONTACT</h2>
+          </div>
+        </div>
       </div>
 
       <!-- 3. CONTACT BODY TEXTS (Shown on Contact Landing Page - Image 7) -->
@@ -251,6 +342,26 @@
           <p class="contact-line">Or just want to keep in contact?</p>
           <p class="contact-line contact-gap">Email is best to keep it organized!</p>
           <p class="contact-line">Reach me at <a href="#" class="contact-email-link" data-email-user="v0ault.ma" data-email-domain="gmail.com">v0ault.ma [at] gmail [dot] com</a></p>
+        </div>
+
+        <!-- Contact Subpage Visual Anchor 1: EDUCATION (Photo A hidden, Text button always visible) -->
+        <div class="bio-interactive-item bio-item-education is-subpage-anchor" tabindex="0" role="button" aria-label="Education View">
+          <div class="bio-photo-wrapper photo-wrap-education is-hidden-on-contact">
+            <img src="assets/photoimageA.png" alt="Vivian - Architecture & Bouwkunde Exhibition" class="bio-photo-img photo-img-education" />
+          </div>
+          <div class="bio-label-wrapper">
+            <h2 class="bio-engraved-title label-education">EDUCATION</h2>
+          </div>
+        </div>
+
+        <!-- Contact Subpage Visual Anchor 2: CONTACT (Photo B + Label) -->
+        <div class="bio-interactive-item bio-item-contact is-subpage-anchor" tabindex="0" role="button" aria-label="Contact Information">
+          <div class="bio-photo-wrapper photo-wrap-contact">
+            <img src="assets/photoimageB.png" alt="Vivian - Contact" class="bio-photo-img photo-img-contact" />
+          </div>
+          <div class="bio-label-wrapper">
+            <h2 class="bio-engraved-title label-contact">CONTACT</h2>
+          </div>
         </div>
       </div>
 
@@ -872,26 +983,6 @@
         </div>
       </div>
 
-      <!-- Right Side Visual Item 1: EDUCATION (Cutout photo A + Label) -->
-      <div class="bio-interactive-item bio-item-education" id="bio-item-education" tabindex="0" role="button" aria-label="Education View">
-        <div class="bio-photo-wrapper photo-wrap-education" id="photo-wrap-education">
-          <img src="assets/photoimageA.png" alt="Vivian - Architecture & Bouwkunde Exhibition" class="bio-photo-img photo-img-education" />
-        </div>
-        <div class="bio-label-wrapper">
-          <h2 class="bio-engraved-title label-education">EDUCATION</h2>
-        </div>
-      </div>
-
-      <!-- Right Side Visual Item 2: CONTACT (Cutout photo B + Label) -->
-      <div class="bio-interactive-item bio-item-contact" id="bio-item-contact" tabindex="0" role="button" aria-label="Contact Information">
-        <div class="bio-photo-wrapper photo-wrap-contact" id="photo-wrap-contact">
-          <img src="assets/photoimageB.png" alt="Vivian - Contact" class="bio-photo-img photo-img-contact" />
-        </div>
-        <div class="bio-label-wrapper">
-          <h2 class="bio-engraved-title label-contact">CONTACT</h2>
-        </div>
-      </div>
-
     </section>
 
     <!-- Tactile Architectural Popover Modal for Education / Contact -->
@@ -916,6 +1007,6 @@
 
   </main>
 
-  <script src="app.js?v=110"></script>
+  <script src="app.js?v=115"></script>
 </body>
 </html>
